@@ -51,32 +51,67 @@ uint16_t sAddress = 0x04;
 uint8_t sCommand = 0x2;
 uint8_t sRepeats = 1;
 
-void loop() {
-    /*
-     * Print current send values
-     */
-    Serial.println();
-    Serial.print(F("Send now: address=0x"));
-    Serial.print(sAddress, HEX);
-    Serial.print(F(" command=0x"));
-    Serial.print(sCommand, HEX);
-    Serial.print(F(" repeats="));
-    Serial.print(sRepeats);
-    Serial.println();
+/**
+ * Useful commands (format address,command):
+ * 4,2 - Volume up
+ * 4,3 - Volume down
+ * 4,8 - Toggle power
+ */
 
-    Serial.println(F("Send NEC with 16 bit address"));
-    Serial.flush();
+int parseHexCommand(char *input, size_t input_size) {
+    char *command = input;
+    size_t i = 0;
+    while(i++ < input_size && *command++ != ',');
 
-    // Results for the first loop to: Protocol=NEC Address=0x102 Command=0x34 Raw-Data=0xCB340102 (32 bits)
-    IrSender.sendNEC(sAddress, sCommand, sRepeats);
-
-    if(sCommand == 0x02) {
-      sCommand = 0x03;
-    } else {
-      sCommand = 0x02;
+    if(command[-1] != ',') {
+      Serial.println("[ERROR] input malformatted, should be 'address,command'");
+      return -1;
+    }
     
+
+    // Assume at this point they sent us a valid hex string...
+    sAddress = (uint16_t) strtol(input, NULL, 16);
+    sCommand = (uint8_t) strtol(command, NULL, 16);
+    return 0;
+}
+
+void loop() {
+
+    while(!Serial.available());
+    static char input[64];
+    size_t charsRead = Serial.readBytesUntil('\n', input, 63);
+    
+    if(charsRead == 0) {
+      Serial.println("[ERROR] timed out on serial read");
+      return;
     }
 
+    if(input[charsRead] != 0) {
+      Serial.println("[ERROR] input too long and/or clobbered");
+      return;
+    }
 
-    delay(1000);  // delay must be greater than 5 ms (RECORD_GAP_MICROS), otherwise the receiver sees it as one long signal
+    if(isdigit(input[0])) {
+      if(parseHexCommand(input, sizeof(input)))
+        return;
+    } else {
+      // They're trying to send us a text command, see if we have it covered
+      #define CASE(text_command, address, command) \
+      if(!strcmp(input, text_command)) { \
+        sAddress = address; \
+        sCommand = command; \
+      } \
+
+      CASE("volume up", 0x4, 0x2)
+      CASE("volume down", 0x4, 0x3)
+      CASE("power", 0x4, 0x8)
+      
+    }
+    // To prevent us clobbering the input buffer with prior inputs, clear it each time
+    memset(input, 0, sizeof(input));
+    
+    Serial.println("[INFO] sending address " + String(sAddress) + " command " + String(sCommand));
+    IrSender.sendNEC(sAddress, sCommand, sRepeats);
+
+    delay(2 * RECORD_GAP_MICROS / 1000);  // delay must be greater than 5 ms (RECORD_GAP_MICROS), otherwise the receiver sees it as one long signal
 }
