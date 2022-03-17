@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, get};
 use actix_web::http::header::ContentType;
 
 fn base(serial_command: &str) -> HttpResponse {
-    let response = crate::arduino::send("/dev/ttyUSB0", serial_command).unwrap();
+    let response = crate::arduino::send("/dev/ttyUSB0", serial_command.as_bytes()).unwrap();
 
 
     HttpResponse::Ok()
