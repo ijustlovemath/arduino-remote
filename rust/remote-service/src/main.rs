@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware;
 use std::io;
@@ -13,8 +14,13 @@ async fn main() -> io::Result<()> {
     env_logger::init();
 
     HttpServer::new(|| {
+        let cors = Cors::default()
+            .allowed_methods(vec!["GET"])
+            .allow_any_header()
+            .allow_any_origin();
         App::new()
             // enable logger - always register actix-web Logger middleware last
+            .wrap(cors)
             .wrap(middleware::Logger::default())
             // register HTTP requests handlers
             .service(volume::up)

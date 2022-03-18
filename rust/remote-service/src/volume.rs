@@ -13,7 +13,7 @@ fn base(serial_command: &str) -> HttpResponse {
 
 #[get("/volume/up")]
 pub async fn up() -> HttpResponse {
-    let serial_command = "volume up";
+    let serial_command = "volume up\n";
     base(&serial_command)
 }
 
