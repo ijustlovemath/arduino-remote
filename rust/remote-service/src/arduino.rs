@@ -7,7 +7,7 @@ pub fn send(path: &str, contents: &[u8]) -> Result<String> {
     let mut port = serialport::new(path, 115200)
         .timeout(Duration::from_millis(10))
         .data_bits(serialport::DataBits::Eight)
-        .flow_control(serialport::FlowControl::Software)
+        .flow_control(serialport::FlowControl::Hardware)
         .parity(serialport::Parity::None)
         .stop_bits(serialport::StopBits::One)
         .open_native()
@@ -30,12 +30,12 @@ pub fn send(path: &str, contents: &[u8]) -> Result<String> {
     // TODO: assert we wrote all the bytes, but lets just do happy path for now
 
     // TODO: read when theres data, aka async, but for now lets just sleep
-    std::thread::sleep(Duration::from_millis(10));
+    std::thread::sleep(Duration::from_millis(1));
 
     let mut buffer = std::vec::Vec::<u8>::new();
     match port.read_to_end(&mut buffer) {
         Ok(bytes_read) => { 
-            println!("got a read!! {:?}", buffer);
+            println!("got a read!! {} bytes, {:?}", bytes_read, buffer);
             let s = match std::str::from_utf8(&buffer) {
                 Ok(v) => v,
                 Err(_) => {
@@ -50,7 +50,7 @@ pub fn send(path: &str, contents: &[u8]) -> Result<String> {
             return Ok(s.to_owned());
         },
         Err(err) => {
-            println!("issue reading from the serial device");
+            println!("issue reading from the serial device, {:?}", err.kind());
             return Err(err.into());
         }
     }

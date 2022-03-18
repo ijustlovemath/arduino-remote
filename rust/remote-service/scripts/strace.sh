@@ -1,2 +1,5 @@
 #!/bin/bash
-sudo strace -o /tmp/strace.log -e openat,ioctl,fcntl,ppoll,write,read -f "$@"
+if [ -z "$LOGNAME" ] ; then
+    LOGNAME="/tmp/strace.log"
+fi
+sudo strace -o "$LOGNAME" -e openat,ioctl,fcntl,ppoll,write,read -ff "$@"
