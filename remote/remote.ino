@@ -24,21 +24,26 @@
 
 #include <IRremote.hpp>
 
+#define STARTUP_INFO 1
+
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
 
     Serial.begin(115200);
 
+#if STARTUP_INFO
     // Just to know which program is running on my Arduino
     Serial.println(F("START " __FILE__ " from " __DATE__ "\r\nUsing library version " VERSION_IRREMOTE));
-
+#endif
     /*
      * The IR library setup. That's all!
      */
     IrSender.begin(); // Start with IR_SEND_PIN as send pin and if NO_LED_FEEDBACK_CODE is NOT defined, enable feedback LED at default feedback LED pin
 
+#if STARTUP_INFO
     Serial.print(F("Ready to send IR signals at pin "));
     Serial.println(IR_SEND_PIN);
+#endif
 }
 
 /*
