@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using System.IO.Ports;
+//using System.IO.Ports;
+using RJCP.IO.Ports;
+using System.Text;
 
 namespace net.Controllers {
 
@@ -16,29 +18,69 @@ public class VolumeController : ControllerBase
     }
 
     [HttpGet(Name = "up")]
-    public net.ArduinoReponse Get()
+    //public net.ArduinoReponse Get()
+    public async Task<string> Get()
     {
+        /*
         SerialPort _port = new SerialPort();
         _port.PortName = "/dev/ttyUSB0";
         _port.BaudRate = 115200;
         _port.Parity = Parity.None;
         _port.DataBits = 8;
         _port.StopBits = StopBits.One;
-        _port.Handshake = Handshake.None;
+        _port.Handshake = Handshake.RequestToSendXOnXOff;
 
-        _port.ReadTimeout = 10;
+        _port.ReadTimeout = 100;
+        
+        string response = "[ERROR] No response received";
 
-        _port.Open();
+        try {
+            _port.Open();
+            _port.WriteLine("volume up");
+            Console.WriteLine("wrote command, sleeping");
+            Thread.Sleep(300);
+            response = _port.ReadExisting();
+            Console.WriteLine("got reponse: '{0}'", response);
+        } finally {
+            Console.WriteLine("closing port");
+            _port.Close();
+            Console.WriteLine("port closed");
+        }
+*/
+        var serial = new SerialPortStream("/dev/ttyUSB0", 115200);
+        serial.Handshake = Handshake.DtrXOn;
+        serial.ReadTimeout = 300;
+        serial.Open();
+        serial.Flush();
+        //byte[] command = ASCIIEncoding.ASCII.GetBytes("volume up\n");
+        //var channel = new CancellationToken();
+        //serial.WriteAsync(command, 0, command.Length, channel);
 
+        Console.WriteLine("");
+        serial.WriteLine("volume up");
+        string response = "jokes";
+        Console.WriteLine("attempting to read...");
+        //while(!serial.CanRead);
+        //string latest = serial.ReadExisting();
+        //response = latest;
+        //Thread.Sleep(300);
 
+        
+        var read_buffer = new byte[256];
+        var bytes_read = await serial.ReadAsync(read_buffer, 0, 20);
+        Console.WriteLine("read {0} bytes", bytes_read);
+        response = Encoding.ASCII.GetString(
+            read_buffer
+                .Take(bytes_read)
+                .ToArray()
+        );
+        
+        Console.WriteLine("Read '{0}'! attempting to close...", response);
+        
+        serial.Close();
 
-        _port.WriteLine("volume up");
-
-        string response = _port.ReadLine();       
-
-        _port.Close();
-
-        return new ArduinoReponse(response);
+        /* remember to change the function signature if you change this */         
+        return response;//new ArduinoReponse(response);
     }
 }
 }

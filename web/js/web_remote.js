@@ -13,7 +13,7 @@ function toggle_handler () {
 toggle_power.addEventListener("click", () => {
     var req = new XMLHttpRequest();
     req.addEventListener("load", toggle_handler);
-    req.open("GET", "http://localhost:9090/volume/up");
+    req.open("GET", "https://localhost:9090/volume/up");
     req.setRequestHeader("Access-Control-Allow-Origin", "*");
     req.send();
 });

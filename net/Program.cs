@@ -2,12 +2,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+var desired_host = "http://localhost:9090";
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
-builder.WebHost.UseUrls("http://localhost:9090");
+builder.WebHost.UseUrls(desired_host);
 
 var app = builder.Build();
 
@@ -30,4 +32,4 @@ app.UseCors(x => x
     .AllowCredentials()
 );
 
-app.Run("http://localhost:9090");
+app.Run(desired_host);
