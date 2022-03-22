@@ -1,3 +1,4 @@
+import datetime
 import serial
 ser = serial.Serial('/dev/ttyUSB0', 115200)
 
@@ -18,7 +19,10 @@ def query(data):
     response = ser.readline().decode('utf-8').rstrip('\r\n')
     # All responses will look like '[status] message'
     status, message = response[1:].split("] ", 1)
-    return dict(status=status, message=message)
+    return dict(status=status
+        , message=message
+        , utc_time=datetime.datetime.utcnow()
+    )
 
 #print(query('volume up'))
 #print(query('volume down'))
