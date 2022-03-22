@@ -6,7 +6,9 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-PyVISA = "^1.11.3"
+pyserial = "^3.5"
+Django = "^4.0.3"
+djangorestframework = "^3.13.1"
 
 [tool.poetry.dev-dependencies]
 
