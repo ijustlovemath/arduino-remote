@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-//using System.IO.Ports;
-using RJCP.IO.Ports;
+using System.IO.Ports;
+//using RJCP.IO.Ports;
 using System.Text;
 
 namespace net.Controllers {
@@ -47,11 +47,16 @@ public class VolumeController : ControllerBase
             Console.WriteLine("port closed");
         }
 */
-        var serial = new SerialPortStream("/dev/ttyUSB0", 115200);
-        serial.Handshake = Handshake.DtrXOn;
+        //var serial = new SerialPortStream("/dev/ttyUSB0", 115200);
+        var serial = new SerialPort("/dev/ttyUSB0", 115200);
+        serial.Handshake = Handshake.None;//DtrXOn;
         serial.ReadTimeout = 300;
         serial.Open();
-        serial.Flush();
+        for(int i = 0; i < 3; i++) {
+            string startup = serial.ReadLine();
+            Console.WriteLine("[STARTUP] " + startup);
+        }
+        //serial.Flush();
         //byte[] command = ASCIIEncoding.ASCII.GetBytes("volume up\n");
         //var channel = new CancellationToken();
         //serial.WriteAsync(command, 0, command.Length, channel);
@@ -64,8 +69,8 @@ public class VolumeController : ControllerBase
         //string latest = serial.ReadExisting();
         //response = latest;
         //Thread.Sleep(300);
-
-        
+        response = serial.ReadLine();
+        /*
         var read_buffer = new byte[256];
         var bytes_read = await serial.ReadAsync(read_buffer, 0, 20);
         Console.WriteLine("read {0} bytes", bytes_read);
@@ -74,7 +79,7 @@ public class VolumeController : ControllerBase
                 .Take(bytes_read)
                 .ToArray()
         );
-        
+        */
         Console.WriteLine("Read '{0}'! attempting to close...", response);
         
         serial.Close();

@@ -9,6 +9,7 @@ python = "^3.10"
 pyserial = "^3.5"
 Django = "^4.0.3"
 djangorestframework = "^3.13.1"
+Nuitka = "^0.7.6"
 
 [tool.poetry.dev-dependencies]
 
