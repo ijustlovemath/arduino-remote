@@ -1,0 +1,1 @@
+These log files are the output of strace, used to diagnose the differences in how the Arduino IDE and my attempts at other serial port usages differed. There's pretty clear differences in port setup and polling mechanisms which may explain the functionality differences.
