@@ -47,7 +47,8 @@ proc main() =
     for i in 0..3:
         echo "tryna read"
         echo port.readLine()
-    discard port.writeLine("volume up", 100)
+    let command = "volume up\n"
+    port.write(command, len(command))
     echo "data written, flushing"
     echo "flushed, cleaning up"
     echo port.readLine()
