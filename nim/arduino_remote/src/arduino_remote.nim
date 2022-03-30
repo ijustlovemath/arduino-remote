@@ -18,8 +18,9 @@ proc main() =
     else:
         handshake = Handshake.None
 
-    #let port = newSerialPort("/dev/ttyUSB0")
-    let port = newSerialStream("/dev/ttyUSB0"
+    let port = newSerialPort("/dev/ttyUSB1")
+#[
+    let port = newSerialStream("/dev/ttyUSB1"
         , 115200
         , Parity.None
         , 8
@@ -27,32 +28,43 @@ proc main() =
         , handshake
         , buffered=false
     )
+]#
 
-#[
     port.open(115200
         , Parity.None
         , 8
         , StopBits.One
         , handshake
     )
-]#
 
-    port.flush()
-    port.dtrEnable = false
-    port.rtsEnable = false
-    defer: close(port)
+
+    # Set the RTS/DTR lines
+    port.dtrEnable = true
+    port.rtsEnable = true
+    port.iflush()
+ #   defer: close(port)
 
     port.setTimeouts(1000,100)
 
-    for i in 0..3:
-        echo "tryna read"
-        echo port.readLine()
+    #for i in 0..3:
+    #    echo "tryna read"
+    #    echo port.readLine()
     let command = "volume up\n"
-    port.write(command, len(command))
-    echo "data written, flushing"
-    echo "flushed, cleaning up"
-    echo port.readLine()
-
-
+    discard port.write(command) #, len(command))
+    echo "data written"
+    #port.flush()
+    #echo "flushed, cleaning up"
+#[    echo "reading response"
+    try:
+        echo port.readLine()
+    except:
+        echo "no data"
+]#
+    echo "closing port"
+    port.close()
+#[
+    echo "closing port (again)"
+    close(port)
+]#
 when isMainModule:
     main()

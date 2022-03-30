@@ -1,6 +1,6 @@
 import datetime
 import serial
-ser = serial.Serial('/dev/ttyUSB0', 115200)
+ser = serial.Serial('/dev/ttyUSB1', 115200)
 
 assert b'foo' == bytes('foo', 'utf-8')
 
