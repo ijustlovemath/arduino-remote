@@ -1,6 +1,14 @@
 import datetime
 import serial
-ser = serial.Serial('/dev/ttyUSB1', 115200)
+
+ports = ["/dev/ttyUSB0", "/dev/ttyUSB1"]
+for port in ports:
+    try:
+        ser = serial.Serial(port, 115200)
+        break
+    except:
+        pass
+
 
 assert b'foo' == bytes('foo', 'utf-8')
 

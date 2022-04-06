@@ -6,7 +6,7 @@ proc main() =
     #let port = newSerialPort("/dev/ttyUSB0")
         
 
-    let choice = 1
+    let choice = 3
     var handshake = Handshake.None
     case choice
     of 2:
@@ -48,18 +48,18 @@ proc main() =
 
     #for i in 0..3:
     #    echo "tryna read"
-    #    echo port.readLine()
+    #    echo port.read(100)
     let command = "volume up\n"
     discard port.write(command) #, len(command))
     echo "data written"
     #port.flush()
     #echo "flushed, cleaning up"
-#[    echo "reading response"
+    echo "reading response"
     try:
-        echo port.readLine()
+        echo port.read(100)
     except:
         echo "no data"
-]#
+
     echo "closing port"
     port.close()
 #[
