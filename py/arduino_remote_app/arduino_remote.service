@@ -1,0 +1,9 @@
+[Service]
+Restart=always
+RestartSec=10
+ExecStart=sudo su jer /home/jer/projects/arduino-remote/py/arduino_remote_app/run
+After=network.target
+Requires=network.target
+
+[Install]
+WantedBy=multi-user.target
