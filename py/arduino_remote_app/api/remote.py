@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone, timedelta
 import serial
 
 ports = ["/dev/ttyUSB0", "/dev/ttyUSB1"]
@@ -27,9 +27,13 @@ def query(data):
     response = ser.readline().decode('utf-8').rstrip('\r\n')
     # All responses will look like '[status] message'
     status, message = response[1:].split("] ", 1)
+    # Hacky timezone fix, needed to get a semblance of local time
+    local_tz = timezone(timedelta(hours=-4.0))
     return dict(status=status
         , message=message
-        , utc_time=datetime.datetime.utcnow()
+        , utc_time=datetime.utcnow()
+        , local_time=datetime.now(local_tz)
+        , local_tz=str(local_tz)
     )
 
 #print(query('volume up'))

@@ -1,9 +1,9 @@
 [Service]
 User=jer
 WorkingDirectory=/home/jer/projects/arduino-remote/py/arduino_remote_app
-Restart=always
-RestartSec=10
-ExecStart=sudo su jer /home/jer/projects/arduino-remote/py/arduino_remote_app/run
+#Restart=always
+#RestartSec=10
+ExecStart=/home/jer/projects/arduino-remote/py/arduino_remote_app/run
 After=network.target
 Requires=network.target
 

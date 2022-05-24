@@ -1,3 +1,4 @@
 #!/bin/bash
 source $(poetry env info --path)/bin/activate
+export PYTHON_UNBUFFERED=1
 sudo $(find . -name "manage.py") runserver 0.0.0.0:80
