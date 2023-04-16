@@ -4,8 +4,10 @@ WorkingDirectory=/home/jer/projects/arduino-remote/py/arduino_remote_app
 #Restart=always
 #RestartSec=10
 ExecStart=/home/jer/projects/arduino-remote/py/arduino_remote_app/run
-After=network.target
-Requires=network.target
+
+[Unit]
+After=network-online.target
+Requires=network-online.target
 
 [Install]
 WantedBy=multi-user.target
