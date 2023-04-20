@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
 import subprocess
+import os
 
 from .remote import query
 
@@ -23,6 +24,17 @@ def power_toggle(request):
 
 @api_view(["GET"])
 def restart_spotify(request):
-    proc = subprocess.Popen("pkill spotify; sleep 1; gtk-launch spotify &")
-    resp = dict(lines=[l for l, _ in zip(proc.stdout, range(10))])
+    resp = None
+    try:
+        command = "gtk-launch spotify"
+        #command = "su jer 'pkill spotify; sleep 1; gtk-launch spotify &'"
+        #print(os.environ['XAUTHORITY'])
+        ret = os.system(command)
+
+        #proc = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+        #ret = '##'.join(line for line, _ in zip(proc.stdout, range(3)))
+        resp = dict(status="success", code=ret, disp=os.environ.get('DISPLAY', 'unknown display'))
+    except Exception as e:
+        resp = dict(status="failure", error=str(e), xauth=os.environ.get('XAUTHORITY', 'No XAuthority available'))
+        
     return JsonResponse(resp)
