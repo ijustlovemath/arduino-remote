@@ -2,6 +2,7 @@ from datetime import datetime, timezone, timedelta
 import serial
 
 ports = ["/dev/ttyUSB0", "/dev/ttyUSB1"]
+ser = None
 for port in ports:
     try:
         ser = serial.Serial(port, 115200)
@@ -9,6 +10,8 @@ for port in ports:
     except:
         pass
 
+if ser is None:
+    raise ValueError("serial device already in use or doesnt exist")
 
 assert b'foo' == bytes('foo', 'utf-8')
 

@@ -57,10 +57,17 @@ uint8_t sCommand = 0x2;
 uint8_t sRepeats = 1;
 
 /**
+ * from here: https://www.remotecentral.com/cgi-bin/mboard/rc-discrete/thread.cgi?5478
  * Useful commands (format address,command):
  * 4,2 - Volume up
  * 4,3 - Volume down
  * 4,8 - Toggle power
+ * 4,e - Set sleep timer
+ * 4,ff - press enter
+ * 4,43 - menu
+ * 4,44 - ok
+ * 4,45/46/47/48 - up/down/left/right
+ * 4,49 - exit
  */
 
 int parseHexCommand(char *input, size_t input_size) {
@@ -80,11 +87,15 @@ int parseHexCommand(char *input, size_t input_size) {
     return 0;
 }
 
+#define CLEAR(buf_) memset((buf_), 0, sizeof((buf_)))
+
 void loop() {
 
     while(!Serial.available());
     static char input[64];
+    
     size_t charsRead = Serial.readBytesUntil('\n', input, 63);
+    Serial.println(String(charsRead));
     
     if(charsRead == 0) {
       Serial.println("[ERROR] timed out on serial read");
@@ -92,29 +103,59 @@ void loop() {
     }
 
     if(input[charsRead] != 0) {
-      Serial.println("[ERROR] input too long and/or clobbered");
-      return;
+      if (input[charsRead - 1] == '\n' || charsRead == 1) {
+        Serial.println("[INFO] repeating last command...");
+        goto run_command;
+      } else {
+        Serial.println("[ERROR] input too long and/or clobbered: " + String(input));
+        goto clear_fail;
+      }
     }
 
     if(isdigit(input[0])) {
-      if(parseHexCommand(input, sizeof(input)))
-        return;
+      if(parseHexCommand(input, sizeof(input))) {
+        goto clear_fail;
+      }
+      goto run_command;
     } else {
       // They're trying to send us a text command, see if we have it covered
+      int found = 0;
+      //Serial.println(String("processing command: ") + String(input));
       #define CASE(text_command, address, command) \
-      if(!strcmp(input, text_command)) { \
+      if(!strncmp(input, text_command, strlen(text_command))) { \
         sAddress = address; \
         sCommand = command; \
+        found = 1; \
       } \
 
       CASE("volume up", 0x4, 0x2)
       CASE("volume down", 0x4, 0x3)
       CASE("power", 0x4, 0x8)
+      CASE("menu", 0x4, 0x43)
+      CASE("ok", 0x4, 0x44)
+      CASE("up", 0x4, 0x45)
+      CASE("down", 0x4, 0x46)
+      CASE("left", 0x4, 0x47)
+      CASE("right", 0x4, 0x48)
+      CASE("enter", 0x4, 0xff)
+      CASE("exit", 0x4, 0x49)
+      if(!found) {
+        input[strlen(input) - 1] = 0;
+        Serial.println(String("[ERROR] Unknown command: ") + String(input));
+
+        // To prevent us clobbering the input buffer with prior inputs, clear it each time
+        // Only clear it here so you can just hit enter to repeat last command
+        goto clear_fail;
+      }
+      goto run_command;
       
     }
-    // To prevent us clobbering the input buffer with prior inputs, clear it each time
-    memset(input, 0, sizeof(input));
+clear_fail:
+    CLEAR(input);
+    return;
     
+
+run_command:
     Serial.println("[INFO] sending address " + String(sAddress) + " command " + String(sCommand));
     IrSender.sendNEC(sAddress, sCommand, sRepeats);
 
