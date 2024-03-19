@@ -15,12 +15,48 @@ def volume_up(request):
     return JsonResponse(content)
 
 @api_view(["GET"])
+def remote_repeat(request):
+    return JsonResponse(query(""))
+
+@api_view(["GET"])
 def volume_down(request):
     return JsonResponse(query("volume down"))
 
 @api_view(["GET"])
 def power_toggle(request):
     return JsonResponse(query("power"))
+
+@api_view(["GET"])
+def remote_up(request):
+    return JsonResponse(query("up"))
+
+@api_view(["GET"])
+def remote_down(request):
+    return JsonResponse(query("down"))
+
+@api_view(["GET"])
+def remote_left(request):
+    return JsonResponse(query("left"))
+
+@api_view(["GET"])
+def remote_right(request):
+    return JsonResponse(query("right"))
+
+@api_view(["GET"])
+def remote_ok(request):
+    return JsonResponse(query("ok"))
+
+@api_view(["GET"])
+def remote_enter(request):
+    return JsonResponse(query("enter"))
+
+@api_view(["GET"])
+def remote_exit(request):
+    return JsonResponse(query("exit"))
+
+@api_view(["GET"])
+def remote_menu(request):
+    return JsonResponse(query("menu"))
 
 @api_view(["GET"])
 def restart_spotify(request):

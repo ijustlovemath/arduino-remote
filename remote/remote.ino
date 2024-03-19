@@ -95,7 +95,6 @@ void loop() {
     static char input[64];
     
     size_t charsRead = Serial.readBytesUntil('\n', input, 63);
-    Serial.println(String(charsRead));
     
     if(charsRead == 0) {
       Serial.println("[ERROR] timed out on serial read");
@@ -104,7 +103,7 @@ void loop() {
 
     if(input[charsRead] != 0) {
       if (input[charsRead - 1] == '\n' || charsRead == 1) {
-        Serial.println("[INFO] repeating last command...");
+   //     Serial.println("[INFO] repeating last command...");
         goto run_command;
       } else {
         Serial.println("[ERROR] input too long and/or clobbered: " + String(input));
